@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Control Center | Career Collaborative</title>
+<meta name="description" content="Every dashboard and tool the Career Collaborative uses, in one place.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23003C5F'/%3E%3Crect x='11' y='40' width='7' height='12' fill='%2374AA50'/%3E%3Crect x='18' y='40' width='7' height='12' fill='%23BE3A34'/%3E%3Crect x='25' y='40' width='7' height='12' fill='%23FDC55E'/%3E%3Crect x='32' y='40' width='7' height='12' fill='%233DC4B2'/%3E%3Crect x='39' y='40' width='7' height='12' fill='%2328724F'/%3E%3Crect x='46' y='40' width='7' height='12' fill='%2300A9E0'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  /* Champlain College brand palette (Office of Marketing brand guide) */
+  :root {
+    color-scheme: light dark;
+    --champlain-blue: #003C5F; /* Primary, Pantone 302 C */
+    --navy: #002A3A;           /* Secondary, Pantone 303 C */
+    --blue: #236192;           /* Secondary, Pantone 647 C */
+    --sky: #00A9E0;            /* Secondary, Pantone 2995 C */
+    --sky-50: #7ED3EF;         /* Pantone 2995 C, 50% tint */
+    --sky-25: #BEE9F7;         /* Pantone 2995 C, 25% tint */
+
+    /* Light mode */
+    --page: #FFFFFF;
+    --surface: #FFFFFF;
+    --line: var(--sky-25);
+    --text: var(--navy);
+    --text-soft: var(--champlain-blue);
+    --note: var(--blue);
+    --header: var(--champlain-blue);
+    --focus: var(--sky);
+    --focus-inner: var(--champlain-blue);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: var(--navy);
+      --surface: var(--champlain-blue);
+      --line: var(--blue);
+      --text: #FFFFFF;
+      --text-soft: var(--sky-25);
+      --note: var(--sky-50);
+      --header: var(--champlain-blue);
+      --focus: var(--sky-50);
+      --focus-inner: var(--navy);
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--text);
+    font-family: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding-left: clamp(20px, 5vw, 48px);
+    padding-right: clamp(20px, 5vw, 48px);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Header */
+  .masthead { background: var(--header); color: #FFFFFF; }
+
+  .masthead .wrap {
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 650;
+    line-height: 1.3;
+  }
+
+  /* One color segment per dashboard; the matching segment widens on hover or focus */
+  .stripe { display: flex; height: 10px; }
+  .stripe span { flex: 1 1 0; background: var(--accent); transition: flex-grow 0.35s ease; }
+  .stripe span.is-active { flex-grow: 4; }
+
+  /* Dashboard list */
+  main .wrap {
+    padding-top: clamp(28px, 5vw, 52px);
+    padding-bottom: clamp(48px, 8vw, 80px);
+  }
+
+  .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: clamp(14px, 2.5vw, 22px);
+    padding: clamp(16px, 2.5vw, 22px) clamp(16px, 3vw, 26px);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  a.row:hover {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+  }
+
+  a.row:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 3px var(--focus-inner);
+  }
+
+  .tile {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: var(--accent);
+    color: var(--ink);
+  }
+
+  .tile svg { width: 28px; height: 28px; }
+
+  .name {
+    margin: 0;
+    font-size: 1.1875rem;
+    font-weight: 650;
+    font-stretch: 105%;
+    line-height: 1.25;
+  }
+
+  .desc {
+    margin: 4px 0 0;
+    max-width: 60ch;
+    color: var(--text-soft);
+  }
+
+  .note {
+    margin: 8px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--note);
+  }
+
+  .note svg { width: 14px; height: 14px; flex: none; }
+
+  .chev {
+    width: 22px;
+    height: 22px;
+    color: var(--note);
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  a.row:hover .chev { transform: translateX(3px); color: var(--text); }
+
+  /* A dashboard without a link yet */
+  .row.is-pending { border-style: dashed; }
+  .row.is-pending .tile { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--line); }
+
+  footer .wrap {
+    padding-top: 24px;
+    padding-bottom: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    font-size: 0.875rem;
+    color: var(--text-soft);
+  }
+
+  footer p { margin: 0; }
+  footer a { color: var(--note); text-underline-offset: 3px; }
+  footer a:hover { color: var(--text); }
+  footer a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 2px; }
+
+  @media (max-width: 520px) {
+    .tile { width: 46px; height: 46px; border-radius: 10px; }
+    .tile svg { width: 24px; height: 24px; }
+    .name { font-size: 1.0625rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <h1>Control Center</h1>
+  </div>
+  <div class="stripe" id="stripe" aria-hidden="true"></div>
+</header>
+
+<main>
+  <div class="wrap">
+    <h2 class="visually-hidden">Dashboards</h2>
+    <ul class="list" id="list"></ul>
+    <noscript><p>This page needs JavaScript turned on to show the list of dashboards.</p></noscript>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Maintained by the InSight program at the Career Collaborative.</p>
+    <p>Questions? <a href="mailto:insight@champlain.edu">insight@champlain.edu</a></p>
+  </div>
+</footer>
+
+<script>
+  // ==========================================================================
+  // DASHBOARD LIST
+  // To add a dashboard, copy one block, paste it where you want it in the
+  // order, and edit the values.
+  //
+  //   name         Shown as the title of the row
+  //   description  One line about what the dashboard is for
+  //   url          Full link. Leave as "" to show the row as "Link coming soon"
+  //   color        green, red, gold, teal, forest, sky, or blue (brand colors)
+  //   icon         flag, clipboard, wallet, chart, lifebuoy, search, or grid
+  //   note         Optional. Short access info, like "Password required"
+  //   newTab       Optional. true opens the link in a new browser tab
+  // ==========================================================================
+  const DASHBOARDS = [
+    {
+      name: "InSight Lookup Dashboard",
+      description: "Look up a student's InSight milestones, qualifying events, and progress.",
+      url: "https://script.google.com/a/macros/champlain.edu/s/AKfycbxYwAcEUNNXZR1Wu8GxNUiNhMso7Uzntk9SKl8SIe5MQOYcAzxYAYkYUNWRwePvAkXE/exec",
+      color: "sky",
+      icon: "search",
+      note: "Champlain Google sign-in required"
+    },
+    {
+      name: "InSight Milestone Dashboard",
+      description: "Milestone completion across cohorts and tracks.",
+      url: "https://zdavico.github.io/insight-milestone-dashboard/",
+      color: "green",
+      icon: "flag"
+    },
+    {
+      name: "InSight Hold Melt Dashboard",
+      description: "PERC registration holds: who has cleared them and who is still outstanding.",
+      url: "https://zdavico.github.io/insight-hold-melt/",
+      color: "red",
+      icon: "clipboard"
+    },
+    {
+      name: "Game of Life Money Manager for 2030",
+      description: "Budgeting simulation and coaching tools for the Game of Life event.",
+      url: "https://zdavico.github.io/GoL2030/",
+      color: "gold",
+      icon: "wallet"
+    },
+    {
+      name: "InSight Survey Dashboard",
+      description: "Pre and post survey results, with score distributions and effect sizes.",
+      url: "https://zdavico.github.io/insight-dashboard/",
+      color: "teal",
+      icon: "chart"
+    },
+    {
+      name: "SOS: Suicide Prevention for Higher Ed Dashboard",
+      description: "Faculty and staff suicide prevention training data.",
+      url: "https://zdavico.github.io/sos-dashboard/",
+      color: "forest",
+      icon: "lifebuoy",
+      note: "Password required"
+    }
+  ];
+
+  // Brand colors, each paired with an icon color that passes contrast on it
+  const COLORS = {
+    green:  { hex: "#74AA50", ink: "#002A3A" },
+    red:    { hex: "#BE3A34", ink: "#FFFFFF" },
+    gold:   { hex: "#FDC55E", ink: "#002A3A" },
+    teal:   { hex: "#3DC4B2", ink: "#002A3A" },
+    forest: { hex: "#28724F", ink: "#FFFFFF" },
+    sky:    { hex: "#00A9E0", ink: "#002A3A" },
+    blue:   { hex: "#236192", ink: "#FFFFFF" }
+  };
+
+  const ICONS = {
+    flag: '<path d="M5 21V4"/><path d="M5 4h12l-2.5 4.5L17 13H5"/>',
+    clipboard: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2.5h6v3.5H9z"/><path d="M9 13.5l2 2 4-4.5"/>',
+    wallet: '<path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v3"/><path d="M4 7.5V18a2 2 0 0 0 2 2h14V9H6.5A2.5 2.5 0 0 1 4 7.5z"/><circle cx="16" cy="14.5" r="1.2"/>',
+    chart: '<path d="M4 20h16"/><path d="M7.5 16v-5"/><path d="M12 16V7"/><path d="M16.5 16v-7.5"/>',
+    lifebuoy: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.75"/><path d="M5.6 5.6l3.75 3.75M14.65 14.65l3.75 3.75M18.4 5.6l-3.75 3.75M9.35 14.65L5.6 18.4"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="M20.5 20.5l-4.5-4.5"/>',
+    grid: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'
+  };
+
+  const LOCK = '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>';
+  const CHEVRON = '<path d="M9 6l6 6-6 6"/>';
+
+  function svg(paths, cls) {
+    return '<svg' + (cls ? ' class="' + cls + '"' : '') + ' viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + '</svg>';
+  }
+
+  function escapeHTML(text) {
+    return String(text).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  const list = document.getElementById("list");
+  const stripe = document.getElementById("stripe");
+
+  DASHBOARDS.forEach(function (d) {
+    const color = COLORS[d.color] || COLORS.blue;
+    const hasLink = Boolean(d.url);
+    const noteText = hasLink ? d.note : "Link coming soon";
+
+    const inner =
+      '<span class="tile">' + svg(ICONS[d.icon] || ICONS.grid) + '</span>' +
+      '<span class="text">' +
+        '<h3 class="name">' + escapeHTML(d.name) + '</h3>' +
+        '<p class="desc">' + escapeHTML(d.description) + '</p>' +
+        (noteText ? '<p class="note">' + (hasLink ? svg(LOCK) : '') + escapeHTML(noteText) + '</p>' : '') +
+      '</span>' +
+      (hasLink ? svg(CHEVRON, "chev") : '');
+
+    const li = document.createElement("li");
+    const row = document.createElement(hasLink ? "a" : "div");
+    row.className = "row" + (hasLink ? "" : " is-pending");
+    row.style.setProperty("--accent", color.hex);
+    row.style.setProperty("--ink", color.ink);
+    row.innerHTML = inner;
+
+    if (hasLink) {
+      row.href = d.url;
+      if (d.newTab) {
+        row.target = "_blank";
+        row.rel = "noopener";
+      }
+    }
+
+    li.appendChild(row);
+    list.appendChild(li);
+
+    const segment = document.createElement("span");
+    segment.style.setProperty("--accent", color.hex);
+    stripe.appendChild(segment);
+
+    function on() { segment.classList.add("is-active"); }
+    function off() { segment.classList.remove("is-active"); }
+    li.addEventListener("mouseenter", on);
+    li.addEventListener("mouseleave", off);
+    li.addEventListener("focusin", on);
+    li.addEventListener("focusout", off);
+  });
+</script>
+</body>
+</html>
