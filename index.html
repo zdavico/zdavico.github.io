@@ -61,8 +61,6 @@
 
   .wrap {
     width: 100%;
-    max-width: 960px;
-    margin: 0 auto;
     padding-left: clamp(20px, 5vw, 48px);
     padding-right: clamp(20px, 5vw, 48px);
   }
@@ -161,17 +159,27 @@
     color: var(--text-soft);
   }
 
-  .note {
-    margin: 8px 0 0;
+  .tags {
+    margin: 10px 0 0;
     display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.875rem;
+    padding: 3px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.8125rem;
     font-weight: 500;
+    line-height: 1.4;
     color: var(--note);
   }
 
-  .note svg { width: 14px; height: 14px; flex: none; }
+  .tag svg { width: 13px; height: 13px; flex: none; }
 
   .chev {
     width: 22px;
@@ -251,7 +259,8 @@
   //   url          Full link. Leave as "" to show the row as "Link coming soon"
   //   color        green, red, gold, teal, forest, sky, or blue (brand colors)
   //   icon         flag, clipboard, wallet, chart, lifebuoy, search, or grid
-  //   note         Optional. Short access info, like "Password required"
+  //   access       open, password, or champlain (Champlain Google sign-in)
+  //   data         Optional. Short data tag, like "Aggregate data only"
   //   newTab       Optional. true opens the link in a new browser tab
   // ==========================================================================
   const DASHBOARDS = [
@@ -261,35 +270,43 @@
       url: "https://script.google.com/a/macros/champlain.edu/s/AKfycbxYwAcEUNNXZR1Wu8GxNUiNhMso7Uzntk9SKl8SIe5MQOYcAzxYAYkYUNWRwePvAkXE/exec",
       color: "sky",
       icon: "search",
-      note: "Champlain Google sign-in required"
+      access: "champlain"
     },
     {
       name: "InSight Milestone Dashboard",
       description: "Milestone completion across cohorts and tracks.",
       url: "https://zdavico.github.io/insight-milestone-dashboard/",
       color: "green",
-      icon: "flag"
+      icon: "flag",
+      access: "open",
+      data: "Aggregate data only"
     },
     {
       name: "InSight Hold Melt Dashboard",
-      description: "Aggregate registration hold data, charting, and forecasting.",
+      description: "PERC registration holds: who has cleared them and who is still outstanding.",
       url: "https://zdavico.github.io/insight-hold-melt/",
       color: "red",
-      icon: "clipboard"
+      icon: "clipboard",
+      access: "open",
+      data: "Anonymized data only"
     },
     {
       name: "Game of Life Money Manager for 2030",
       description: "Budgeting simulation and coaching tools for the Game of Life event.",
       url: "https://zdavico.github.io/GoL2030/",
       color: "gold",
-      icon: "wallet"
+      icon: "wallet",
+      access: "open",
+      data: "No student data"
     },
     {
       name: "InSight Survey Dashboard",
       description: "Pre and post survey results, with score distributions and effect sizes.",
       url: "https://zdavico.github.io/insight-dashboard/",
       color: "teal",
-      icon: "chart"
+      icon: "chart",
+      access: "open",
+      data: "Aggregate data only"
     },
     {
       name: "SOS: Suicide Prevention for Higher Ed Dashboard",
@@ -297,7 +314,7 @@
       url: "https://zdavico.github.io/sos-dashboard/",
       color: "forest",
       icon: "lifebuoy",
-      note: "Password required"
+      access: "password"
     }
   ];
 
@@ -323,6 +340,14 @@
   };
 
   const LOCK = '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>';
+  const UNLOCK = '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.75-1.4"/>';
+  const SHIELD = '<path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>';
+
+  const ACCESS = {
+    open:      { icon: UNLOCK, label: "Unlocked" },
+    password:  { icon: LOCK,   label: "Password required" },
+    champlain: { icon: LOCK,   label: "Champlain Google sign-in required" }
+  };
   const CHEVRON = '<path d="M9 6l6 6-6 6"/>';
 
   function svg(paths, cls) {
@@ -341,14 +366,25 @@
   DASHBOARDS.forEach(function (d) {
     const color = COLORS[d.color] || COLORS.blue;
     const hasLink = Boolean(d.url);
-    const noteText = hasLink ? d.note : "Link coming soon";
+    function tag(icon, label) {
+      return '<span class="tag">' + (icon ? svg(icon) : '') + escapeHTML(label) + '</span>';
+    }
+
+    const tags = [];
+    if (!hasLink) {
+      tags.push(tag("", "Link coming soon"));
+    } else {
+      const access = ACCESS[d.access];
+      if (access) tags.push(tag(access.icon, access.label));
+      if (d.data) tags.push(tag(SHIELD, d.data));
+    }
 
     const inner =
       '<span class="tile">' + svg(ICONS[d.icon] || ICONS.grid) + '</span>' +
       '<span class="text">' +
         '<h3 class="name">' + escapeHTML(d.name) + '</h3>' +
         '<p class="desc">' + escapeHTML(d.description) + '</p>' +
-        (noteText ? '<p class="note">' + (hasLink ? svg(LOCK) : '') + escapeHTML(noteText) + '</p>' : '') +
+        (tags.length ? '<p class="tags">' + tags.join('') + '</p>' : '') +
       '</span>' +
       (hasLink ? svg(CHEVRON, "chev") : '');
 
