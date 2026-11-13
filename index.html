@@ -76,7 +76,13 @@
   }
 
   /* Header */
-  .masthead { background: var(--header); color: #FFFFFF; }
+  .masthead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--header);
+    color: #FFFFFF;
+  }
 
   .masthead .wrap {
     padding-top: 18px;
